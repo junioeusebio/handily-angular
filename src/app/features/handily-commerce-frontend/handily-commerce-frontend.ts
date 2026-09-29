@@ -15,6 +15,7 @@ import { ApiStatusService } from '@domains';
 
 import { HomeAbout } from './components/home-about/home-about';
 import { HomeBanner } from './components/home-banner/home-banner';
+import { HomeCourses, type CourseLeadRequest } from './components/home-courses/home-courses';
 import { HomeFaq } from './components/home-faq/home-faq';
 import { HomeFooter } from './components/home-footer/home-footer';
 import { HomeHero } from './components/home-hero/home-hero';
@@ -33,6 +34,7 @@ import { LeadDialog } from './components/lead-dialog/lead-dialog';
     HomeAbout,
     HomeServices,
     HomeSolutions,
+    HomeCourses,
     HomeBanner,
     HomeTestimonials,
     HomeFaq,
@@ -64,15 +66,15 @@ export class HandilyCommerceFrontend implements OnInit {
     this.leadDialog().openFrom(event);
   }
 
+  protected openCourseLead({ event, course }: CourseLeadRequest): void {
+    this.leadDialog().openFrom(event, `Tenho interesse no curso "${course.title}".`);
+  }
+
   protected closeLead(): void {
     this.leadDialog().close();
   }
 
-  protected onLeadSubmitted(payload: {
-    nome: string;
-    contato: string;
-    solicitacao: string;
-  }): void {
+  protected onLeadSubmitted(payload: { nome: string; contato: string; solicitacao: string }): void {
     const subject = encodeURIComponent(`Orçamento Handily — ${payload.nome}`);
     const body = encodeURIComponent(
       `Nome: ${payload.nome}\nContato: ${payload.contato}\n\nSolicitação:\n${payload.solicitacao}`,

@@ -1,16 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import {
-  APP_VERSION,
-  provideAppEnvironment,
-  resolveApiRoot,
-  type AppEnvironment,
-} from '@core';
+import { APP_VERSION, provideAppEnvironment, resolveApiRoot, type AppEnvironment } from '@core';
 
 import { HandilyCommerceFrontend } from './handily-commerce-frontend';
 
@@ -24,11 +16,7 @@ describe('HandilyCommerceFrontend', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HandilyCommerceFrontend],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideAppEnvironment(testEnv),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideAppEnvironment(testEnv)],
     }).compileComponents();
   });
 
@@ -483,6 +471,48 @@ describe('HandilyCommerceFrontend', () => {
     expect(root.querySelector('#faq')).toBeTruthy();
     expect(root.textContent).toContain('Pensamento Computacional');
     expect(root.textContent).toContain('O que é a Handily?');
+
+    http.verify();
+  });
+
+  it('should render H4 mock courses and prefill the lead dialog with the chosen course', async () => {
+    const fixture = TestBed.createComponent(HandilyCommerceFrontend);
+    const http = TestBed.inject(HttpTestingController);
+    const root = fixture.nativeElement as HTMLElement;
+
+    fixture.detectChanges();
+    flushBootstrap(http);
+    fixture.detectChanges();
+
+    const section = root.querySelector('#cursos') as HTMLElement;
+    expect(section).toBeTruthy();
+    expect(root.querySelector('a[href="#cursos"]')).toBeTruthy();
+    expect(root.textContent).not.toContain('etapa futura');
+    const courseTitle = section.querySelector('h3')?.textContent?.trim() ?? '';
+    expect(courseTitle).not.toBe('');
+
+    const cta = section.querySelector('button') as HTMLButtonElement;
+    expect(cta.textContent).toContain('Solicitar orçamento');
+    cta.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const dialog = root.querySelector('dialog#lead-dialog') as HTMLDialogElement;
+    expect(dialog).toBeTruthy();
+    const solicitacao = dialog.querySelector('#lead-solicitacao') as HTMLTextAreaElement;
+    expect(solicitacao.value).toContain(courseTitle);
+
+    solicitacao.value = 'Texto editado';
+    solicitacao.dispatchEvent(new Event('input'));
+    dialog.dispatchEvent(new Event('cancel', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    await openLeadModal(fixture);
+    expect((root.querySelector('#lead-solicitacao') as HTMLTextAreaElement).value).toBe(
+      'Texto editado',
+    );
 
     http.verify();
   });

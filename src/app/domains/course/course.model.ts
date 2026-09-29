@@ -1,0 +1,20 @@
+/** Eixos da BNCC Computação. */
+export type BnccAxis = 'pensamento-computacional' | 'mundo-digital' | 'cultura-digital';
+
+/** Rótulos de exibição para cada eixo da BNCC Computação. */
+export const BNCC_AXIS_LABELS: Readonly<Record<BnccAxis, string>> = {
+  'pensamento-computacional': 'Pensamento Computacional',
+  'mundo-digital': 'Mundo Digital',
+  'cultura-digital': 'Cultura Digital',
+};
+
+/** Curso de formação oferecido às redes municipais. */
+export interface Course {
+  id: string;
+  title: string;
+  axis: BnccAxis;
+  summary: string;
+  audience: string;
+  /** Carga horária total em horas, quando definida. */
+  workloadHours?: number;
+}
