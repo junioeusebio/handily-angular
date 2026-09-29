@@ -1,4 +1,4 @@
-/** Eixos da BNCC Computação. */
+/** Eixos da BNCC Computação (kebab-case, como serializado pelo BE). */
 export type BnccAxis = 'pensamento-computacional' | 'mundo-digital' | 'cultura-digital';
 
 /** Rótulos de exibição para cada eixo da BNCC Computação. */
@@ -8,7 +8,7 @@ export const BNCC_AXIS_LABELS: Readonly<Record<BnccAxis, string>> = {
   'cultura-digital': 'Cultura Digital',
 };
 
-/** Curso de formação oferecido às redes municipais. */
+/** Curso de formação oferecido às redes municipais (`GET {apiRoot}/courses`, BE-owned). */
 export interface Course {
   id: string;
   title: string;

@@ -1,17 +1,22 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { MOCK_COURSES } from './course.mock';
+import { APP_ENVIRONMENT, resolveApiRoot } from '@core';
+
 import type { Course } from './course.model';
 
 /**
- * Fonte dos cursos de formação BNCC.
- * Hoje retorna dados mock; a assinatura `list(): Observable<Course[]>` já espelha
- * uma futura `GET {apiRoot}/courses`, para trocar por HttpClient sem mudar os consumidores.
+ * Reads the BNCC Computação course catalog from the Handily Commerce API.
+ * BE owns the list (`GET {apiRoot}/courses`); FE only displays it.
  */
 @Injectable({ providedIn: 'root' })
 export class CourseService {
+  private readonly http = inject(HttpClient);
+  private readonly env = inject(APP_ENVIRONMENT);
+
+  /** `GET ${resolveApiRoot(env)}/courses` */
   list(): Observable<Course[]> {
-    return of([...MOCK_COURSES]);
+    return this.http.get<Course[]>(`${resolveApiRoot(this.env)}/courses`);
   }
 }

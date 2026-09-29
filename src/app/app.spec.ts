@@ -62,6 +62,8 @@ describe('App', () => {
       }
     }
 
+    http.expectOne(`${resolveApiRoot(testEnv)}/courses`).flush([]);
+
     fixture.detectChanges();
     await fixture.whenStable();
 

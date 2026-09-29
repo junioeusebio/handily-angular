@@ -1,52 +1,69 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { firstValueFrom } from 'rxjs';
 
-import { BNCC_AXIS_LABELS, type BnccAxis, type Course } from './course.model';
+import { provideAppEnvironment, resolveApiRoot, type AppEnvironment } from '@core';
+
+import type { Course } from './course.model';
 import { CourseService } from './course.service';
+
+const testEnv: AppEnvironment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:5228/api',
+  apiVersion: 'v1',
+};
+
+const courses: Course[] = [
+  {
+    id: 'pensamento-computacional-na-pratica',
+    title: 'Pensamento Computacional na prática',
+    axis: 'pensamento-computacional',
+    summary: 'Resumo',
+    audience: 'Professores',
+    workloadHours: 40,
+  },
+  {
+    id: 'cultura-digital-e-cidadania',
+    title: 'Cultura Digital e cidadania',
+    axis: 'cultura-digital',
+    summary: 'Resumo',
+    audience: 'Coordenação',
+  },
+];
 
 describe('CourseService', () => {
   let service: CourseService;
+  let http: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideAppEnvironment(testEnv)],
+    });
     service = TestBed.inject(CourseService);
+    http = TestBed.inject(HttpTestingController);
   });
 
-  async function listCourses(): Promise<Course[]> {
-    return firstValueFrom(service.list());
-  }
+  afterEach(() => http.verify());
 
-  it('deve listar entre 3 e 5 cursos mock com ids únicos', async () => {
-    const courses = await listCourses();
-    expect(courses.length).toBeGreaterThanOrEqual(3);
-    expect(courses.length).toBeLessThanOrEqual(5);
-    expect(new Set(courses.map((c) => c.id)).size).toBe(courses.length);
+  it('deve fazer GET de courses na raiz versionada da API', () => {
+    let body: Course[] | undefined;
+    service.list().subscribe((items) => (body = items));
+
+    const req = http.expectOne(`${resolveApiRoot(testEnv)}/courses`);
+    expect(req.request.method).toBe('GET');
+    req.flush(courses);
+
+    expect(body).toEqual(courses);
   });
 
-  it('deve preencher campos obrigatórios e usar eixos BNCC válidos', async () => {
-    const courses = await listCourses();
-    const axes = Object.keys(BNCC_AXIS_LABELS) as BnccAxis[];
-    for (const course of courses) {
-      expect(course.title.trim()).not.toBe('');
-      expect(course.summary.trim()).not.toBe('');
-      expect(course.audience.trim()).not.toBe('');
-      expect(axes).toContain(course.axis);
-      if (course.workloadHours !== undefined) {
-        expect(course.workloadHours).toBeGreaterThan(0);
-      }
-    }
-  });
+  it('deve propagar erro HTTP para o consumidor', () => {
+    let status: number | undefined;
+    service.list().subscribe({ error: (err: { status: number }) => (status = err.status) });
 
-  it('deve cobrir os três eixos da BNCC Computação', async () => {
-    const courses = await listCourses();
-    expect(new Set(courses.map((c) => c.axis))).toEqual(
-      new Set<BnccAxis>(['pensamento-computacional', 'mundo-digital', 'cultura-digital']),
-    );
-  });
+    http
+      .expectOne(`${resolveApiRoot(testEnv)}/courses`)
+      .flush('fail', { status: 503, statusText: 'Service Unavailable' });
 
-  it('deve retornar uma cópia para evitar mutação do mock', async () => {
-    const first = await listCourses();
-    first.pop();
-    const second = await listCourses();
-    expect(second.length).toBe(first.length + 1);
+    expect(status).toBe(503);
   });
 });
