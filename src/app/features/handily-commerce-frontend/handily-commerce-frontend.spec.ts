@@ -1,8 +1,16 @@
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { APP_VERSION, provideAppEnvironment, resolveApiRoot, type AppEnvironment } from '@core';
+import {
+  APP_VERSION,
+  provideAppEnvironment,
+  resolveApiRoot,
+  type AppEnvironment,
+} from '@core';
 
 import { HandilyCommerceFrontend } from './handily-commerce-frontend';
 
@@ -16,7 +24,11 @@ describe('HandilyCommerceFrontend', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HandilyCommerceFrontend],
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideAppEnvironment(testEnv)],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideAppEnvironment(testEnv),
+      ],
     }).compileComponents();
   });
 

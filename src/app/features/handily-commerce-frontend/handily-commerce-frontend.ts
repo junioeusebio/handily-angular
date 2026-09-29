@@ -74,7 +74,11 @@ export class HandilyCommerceFrontend implements OnInit {
     this.leadDialog().close();
   }
 
-  protected onLeadSubmitted(payload: { nome: string; contato: string; solicitacao: string }): void {
+  protected onLeadSubmitted(payload: {
+    nome: string;
+    contato: string;
+    solicitacao: string;
+  }): void {
     const subject = encodeURIComponent(`Orçamento Handily — ${payload.nome}`);
     const body = encodeURIComponent(
       `Nome: ${payload.nome}\nContato: ${payload.contato}\n\nSolicitação:\n${payload.solicitacao}`,
