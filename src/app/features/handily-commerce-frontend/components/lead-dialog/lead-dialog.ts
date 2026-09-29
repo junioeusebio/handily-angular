@@ -4,6 +4,7 @@ import {
   input,
   model,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 
@@ -23,12 +24,26 @@ export class LeadDialog {
 
   readonly submitted = output<{ nome: string; contato: string; solicitacao: string }>();
 
-  openFrom(event?: Event): void {
+  /** Texto atual do campo Solicitação (pode ser pré-preenchido ao abrir). */
+  protected readonly solicitacao = signal('');
+
+  /**
+   * Abre o diálogo a partir de um gatilho.
+   * @param prefill quando informado, substitui o texto de Solicitação (ex.: curso escolhido).
+   */
+  openFrom(event?: Event, prefill?: string): void {
+    if (prefill !== undefined) {
+      this.solicitacao.set(prefill);
+    }
     this.modal().openFrom(event);
   }
 
   close(): void {
     this.modal().close();
+  }
+
+  protected onSolicitacaoInput(event: Event): void {
+    this.solicitacao.set((event.target as HTMLTextAreaElement).value);
   }
 
   protected onSubmit(event: Event): void {

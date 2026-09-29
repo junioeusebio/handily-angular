@@ -40,6 +40,8 @@
         name="solicitacao"
         required
         placeholder="Município, curso ou necessidade"
+        [value]="solicitacao()"
+        (input)="onSolicitacaoInput($event)"
         class="min-h-24 resize-y rounded-[0.65rem] border border-[#d7e0ec] bg-white px-3 py-[0.65rem] text-[#0b1f3a]"
       ></textarea>
     </div>

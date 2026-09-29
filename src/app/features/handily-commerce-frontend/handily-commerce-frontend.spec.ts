@@ -11,6 +11,7 @@ import {
   resolveApiRoot,
   type AppEnvironment,
 } from '@core';
+import type { Course } from '@domains';
 
 import { HandilyCommerceFrontend } from './handily-commerce-frontend';
 
@@ -19,6 +20,17 @@ const testEnv: AppEnvironment = {
   apiBaseUrl: 'http://localhost:5228/api',
   apiVersion: 'v1',
 };
+
+const testCourses: Course[] = [
+  {
+    id: 'pensamento-computacional-na-pratica',
+    title: 'Pensamento Computacional na prática',
+    axis: 'pensamento-computacional',
+    summary: 'Algoritmos e lógica.',
+    audience: 'Professores dos anos iniciais do Ensino Fundamental',
+    workloadHours: 40,
+  },
+];
 
 describe('HandilyCommerceFrontend', () => {
   beforeEach(async () => {
@@ -60,7 +72,11 @@ describe('HandilyCommerceFrontend', () => {
     }
   }
 
-  /** Matches ngOnInit: apiVersion + ping (order not guaranteed). */
+  function flushCourses(http: HttpTestingController, body: Course[] = testCourses): void {
+    http.expectOne(`${resolveApiRoot(testEnv)}/courses`).flush(body);
+  }
+
+  /** Matches ngOnInit: apiVersion + ping (order not guaranteed), plus the courses section. */
   function flushBootstrap(
     http: HttpTestingController,
     opts: {
@@ -68,6 +84,7 @@ describe('HandilyCommerceFrontend', () => {
       ping?: { service: string; apiVersion: string; status: string } | null;
     } = {},
   ): void {
+    flushCourses(http);
     const versionBody = opts.version === undefined ? { version: 'v1' } : opts.version;
     const pingBody =
       opts.ping === undefined
@@ -166,6 +183,7 @@ describe('HandilyCommerceFrontend', () => {
       req.flush('fail', { status: 503, statusText: 'Service Unavailable' });
     }
     flushPing(http);
+    flushCourses(http);
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -187,6 +205,7 @@ describe('HandilyCommerceFrontend', () => {
       const req = http.expectOne(`${resolveApiRoot(testEnv)}/ping`);
       req.flush('fail', { status: 503, statusText: 'Service Unavailable' });
     }
+    flushCourses(http);
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -483,6 +502,48 @@ describe('HandilyCommerceFrontend', () => {
     expect(root.querySelector('#faq')).toBeTruthy();
     expect(root.textContent).toContain('Pensamento Computacional');
     expect(root.textContent).toContain('O que é a Handily?');
+
+    http.verify();
+  });
+
+  it('should render H4 API courses and prefill the lead dialog with the chosen course', async () => {
+    const fixture = TestBed.createComponent(HandilyCommerceFrontend);
+    const http = TestBed.inject(HttpTestingController);
+    const root = fixture.nativeElement as HTMLElement;
+
+    fixture.detectChanges();
+    flushBootstrap(http);
+    fixture.detectChanges();
+
+    const section = root.querySelector('#cursos') as HTMLElement;
+    expect(section).toBeTruthy();
+    expect(root.querySelector('a[href="#cursos"]')).toBeTruthy();
+    expect(root.textContent).not.toContain('etapa futura');
+    const courseTitle = section.querySelector('h3')?.textContent?.trim() ?? '';
+    expect(courseTitle).toBe('Pensamento Computacional na prática');
+
+    const cta = section.querySelector('button') as HTMLButtonElement;
+    expect(cta.textContent).toContain('Solicitar orçamento');
+    cta.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const dialog = root.querySelector('dialog#lead-dialog') as HTMLDialogElement;
+    expect(dialog).toBeTruthy();
+    const solicitacao = dialog.querySelector('#lead-solicitacao') as HTMLTextAreaElement;
+    expect(solicitacao.value).toContain(courseTitle);
+
+    solicitacao.value = 'Texto editado';
+    solicitacao.dispatchEvent(new Event('input'));
+    dialog.dispatchEvent(new Event('cancel', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    await openLeadModal(fixture);
+    expect((root.querySelector('#lead-solicitacao') as HTMLTextAreaElement).value).toBe(
+      'Texto editado',
+    );
 
     http.verify();
   });
