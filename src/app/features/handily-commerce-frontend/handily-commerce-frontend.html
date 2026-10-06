@@ -10,6 +10,7 @@
     <app-home-banner (requestLead)="openLead($event)" />
     <app-home-testimonials />
     <app-home-faq />
+    <app-home-contact [contactEmail]="contactEmail" (requestLead)="openLead($event)" />
   </main>
 
   <app-home-footer

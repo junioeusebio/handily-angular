@@ -15,6 +15,7 @@ import { ApiStatusService } from '@domains';
 
 import { HomeAbout } from './components/home-about/home-about';
 import { HomeBanner } from './components/home-banner/home-banner';
+import { HomeContact } from './components/home-contact/home-contact';
 import { HomeCourses, type CourseLeadRequest } from './components/home-courses/home-courses';
 import { HomeFaq } from './components/home-faq/home-faq';
 import { HomeFooter } from './components/home-footer/home-footer';
@@ -38,6 +39,7 @@ import { LeadDialog } from './components/lead-dialog/lead-dialog';
     HomeBanner,
     HomeTestimonials,
     HomeFaq,
+    HomeContact,
     HomeFooter,
     LeadDialog,
   ],
