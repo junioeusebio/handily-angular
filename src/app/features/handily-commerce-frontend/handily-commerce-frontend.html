@@ -1,7 +1,13 @@
 <div class="handily-home min-h-dvh bg-white text-[#0b1f3a]">
+  <a
+    class="skip-link sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-white focus:px-[1.15rem] focus:py-[0.6rem] focus:text-sm focus:font-bold focus:text-[#0b1f3a] focus:no-underline focus:shadow-lg"
+    href="#conteudo"
+    >Pular para o conteúdo</a
+  >
+
   <app-home-nav [leadOpen]="leadOpen()" (requestLead)="openLead($event)" />
 
-  <main>
+  <main id="conteudo" tabindex="-1" class="scroll-mt-[4.5rem] outline-none">
     <app-home-hero (requestLead)="openLead($event)" />
     <app-home-about />
     <app-home-services (requestLead)="openLead($event)" />

@@ -31,8 +31,10 @@
     class="app-versions border-t border-white/10 px-5 py-4 text-[0.72rem] text-white/45 tabular-nums sm:px-6"
   >
     <div class="mx-auto max-w-6xl">
-      © COPYRIGHT 2026 AJKSys Consulting · WEB: {{ feVersion() }} | API:
-      {{ apiVersionLabel() }} · {{ apiStatusLabel() }}
+      © COPYRIGHT 2026 AJKSys Consulting · WEB: {{ feVersion() }} |
+      <span class="app-api-status" role="status" aria-live="polite" aria-atomic="true"
+        >API: {{ apiVersionLabel() }} · {{ apiStatusLabel() }}</span
+      >
     </div>
   </div>
 </footer>

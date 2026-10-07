@@ -487,6 +487,31 @@ describe('HandilyCommerceFrontend', () => {
     http.verify();
   });
 
+  it('should render a skip link to the main content as the first focusable element', () => {
+    const fixture = TestBed.createComponent(HandilyCommerceFrontend);
+    const http = TestBed.inject(HttpTestingController);
+    const root = fixture.nativeElement as HTMLElement;
+
+    fixture.detectChanges();
+    flushBootstrap(http);
+    fixture.detectChanges();
+
+    const firstFocusable = root.querySelector('a[href], button') as HTMLAnchorElement;
+    expect(firstFocusable.classList).toContain('skip-link');
+    expect(firstFocusable.textContent?.trim()).toBe('Pular para o conteúdo');
+    expect(firstFocusable.getAttribute('href')).toBe('#conteudo');
+    expect(firstFocusable.classList).toContain('sr-only');
+    expect(firstFocusable.classList).toContain('focus:not-sr-only');
+
+    const main = root.querySelector('main#conteudo') as HTMLElement;
+    expect(main).toBeTruthy();
+    expect(main.getAttribute('tabindex')).toBe('-1');
+    main.focus();
+    expect(document.activeElement).toBe(main);
+
+    http.verify();
+  });
+
   it('should render FAQ and solutions sections', async () => {
     const fixture = TestBed.createComponent(HandilyCommerceFrontend);
     const http = TestBed.inject(HttpTestingController);

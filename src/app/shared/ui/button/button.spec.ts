@@ -22,6 +22,28 @@ describe('Button', () => {
     expect(fixture.componentInstance.clicked).toBe(true);
   });
 
+  it('should use the shared keyboard focus ring on every variant', () => {
+    @Component({
+      imports: [Button],
+      template: `<app-button variant="primary">A</app-button>
+        <app-button variant="outline">B</app-button>
+        <app-button variant="ghost">C</app-button>`,
+    })
+    class VariantsHost {}
+
+    const fixture = TestBed.createComponent(VariantsHost);
+    fixture.detectChanges();
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    );
+    expect(buttons.length).toBe(3);
+    for (const button of buttons) {
+      expect(button.classList).toContain('focus-visible:outline-focus');
+      expect(button.classList).toContain('focus-visible:outline-2');
+      expect(button.classList).toContain('focus-visible:outline-offset-2');
+    }
+  });
+
   it('should honor disabled', () => {
     @Component({
       imports: [Button],
