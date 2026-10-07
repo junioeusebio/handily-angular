@@ -12,6 +12,7 @@
   --color-primary: var(--color-primary);
   --color-primary-soft: var(--color-primary-soft);
   --color-border: var(--color-border);
+  --color-focus: var(--color-focus-ring);
 
   /* Spacing → p-*, m-*, gap-* (aligned to --space-*) */
   --spacing-1: var(--space-1);
@@ -62,6 +63,14 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+}
+
+/* A11y: one visible focus ring (keyboard only) for links, buttons and custom tab stops. */
+@layer base {
+  :where(a[href], button, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
 }
 
 body {
